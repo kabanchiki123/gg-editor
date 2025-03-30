@@ -1,4 +1,7 @@
 from PyQt6.QtWidgets import *
+from conwerter import pil2pixmap
+from PIL import Image
+import os
 
 app = QApplication([])
 window = QWidget()
@@ -47,6 +50,59 @@ app.setStyleSheet("""
 """
 )
 
+class ImageProcessor:
+    def __init__(self):
+        self.folder = ""
+        self.filename = ""
+        self.image = ""
+    def load(self):
+        img_path = os.path.join(self.folder, self.filename)
+        self.image = Image.open(img_path)
+
+    def show(self):
+        pix = pil2pixmap(self.image)
+        pix = pix.scaledToWidth(500)
+        photo_lbl.setPixmap(pix)
+
+
+    def rotate_left(self):
+        self.image = self.image.transpose(Image.ROTATE_90)
+        self.show()
+
+    def rotate_right(self):
+        self.image = self.image.transpose(Image.ROTATE_270)
+        self.show()
+
+    def mirror(self):
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+        self.show()
+
+ip = ImageProcessor()
+ip.filename = "j.jpeg"
+ip.load()
+ip.show()
+
+
+def openfolder(self):
+    ip.folder = QFileDialog.getExistingDirectory()
+    files = os.listdir(ip.folder)
+    photo_list.clear()
+    for file in files:
+        if file.endswith(".jpg") or file.endswith(".png"):
+            photo_list.addItem(file)
+
+
+def show_chosen_image(self):
+    ip.filename = photo_list.currentItem().text()
+    ip.load()
+    ip.show()
+
+
+
+vpravo_btn.clicked.connect(ip.rotate_right)
+vlivo_btn.clicked.connect(ip.rotate_left)
+photo_list.currentRowChanged.connect(show_chosen_image)
+papka_btn.clicked.connect(openfolder)
 window.setLayout(mainline)
 window.show()
 app.exec()
