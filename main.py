@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import *
 from conwerter import pil2pixmap
-from PIL import Image
+from PIL import Image, ImageEnhance
 import os
 
 app = QApplication([])
@@ -10,13 +10,14 @@ mainline = QHBoxLayout()
 v1 = QVBoxLayout()
 v2 = QVBoxLayout()
 h1 = QHBoxLayout()
+h2 = QHBoxLayout()
 
 papka_btn = QPushButton("Папка")
 vlivo_btn = QPushButton("Вліво")
 vpravo_btn = QPushButton("Вправо")
 dzerkalo_btn = QPushButton("Дзеркало")
 rizkizt_btn = QPushButton("Різкість")
-black_add_white = QPushButton("Ч/Б")
+black_add_white_btn = QPushButton("Ч/Б")
 
 photo_list = QListWidget()
 photo_lbl = QLabel("фото")
@@ -35,7 +36,11 @@ h1.addWidget(vlivo_btn)
 h1.addWidget(vpravo_btn)
 h1.addWidget(dzerkalo_btn)
 h1.addWidget(rizkizt_btn)
-h1.addWidget(black_add_white)
+h1.addWidget(black_add_white_btn)
+
+mainline.addLayout(h2)
+
+h2.addWidget()
 
 app.setStyleSheet("""
       QWidget{
@@ -61,7 +66,7 @@ class ImageProcessor:
 
     def show(self):
         pix = pil2pixmap(self.image)
-        pix = pix.scaledToWidth(500)
+        pix = pix.scaledToWidth(351)
         photo_lbl.setPixmap(pix)
 
 
@@ -77,6 +82,13 @@ class ImageProcessor:
         self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
         self.show()
 
+    def brightness(self):
+        self.image = ImageEnhance.Brightness(self.image).enhance(1.5)
+        self.show()
+
+    def blackwhite(self):
+        self.image = self.image.convert("L")
+        self.show()
 ip = ImageProcessor()
 ip.filename = "j.jpeg"
 ip.load()
@@ -97,8 +109,9 @@ def show_chosen_image(self):
     ip.load()
     ip.show()
 
-
-
+black_add_white_btn.clicked.connect(ip.blackwhite)
+rizkizt_btn.clicked.connect(ip.brightness)
+dzerkalo_btn.clicked.connect(ip.mirror)
 vpravo_btn.clicked.connect(ip.rotate_right)
 vlivo_btn.clicked.connect(ip.rotate_left)
 photo_list.currentRowChanged.connect(show_chosen_image)
